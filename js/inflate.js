@@ -2117,7 +2117,7 @@ function jszlib_inflate_buffer(buffer, start, length) {
     }
 
     if (oBlockList.length == 1) {
-        return oBlockList[0];
+        return oBlockList[0].buffer;
     } else {
         var out = new Uint8Array(totalSize);
         var cursor = 0;
