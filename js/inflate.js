@@ -648,7 +648,7 @@ Inflate.prototype.inflateSync = function(z){
       return Z_DATA_ERROR;
     }
     r=z.total_in;  w=z.total_out;
-    inflateReset(z);
+    this.inflateReset(z);
     z.total_in=r;  z.total_out = w;
     z.istate.mode = BLOCKS;
     return Z_OK;
@@ -773,7 +773,7 @@ InfBlocks.prototype.reset = function(z, c){
               var tl=[];
 	      var td=[];
 
-	      inflate_trees_fixed(bl, bd, tl, td, z);
+	      this.inflate_trees_fixed(bl, bd, tl, td, z);
               this.codes.init(bl[0], bd[0], tl[0], 0, td[0], 0, z);
           }
 
@@ -845,7 +845,7 @@ InfBlocks.prototype.reset = function(z, c){
 	  }
 	  if(m==0){
 	    this.write=q; 
-	    r=inflate_flush(z,r);
+	    r=this.inflate_flush(z,r);
 	    q=this.write; m = (q < this.read ? this.read-q-1 : this.end-q);
 	    if(q==this.end && this.read != 0){
 	      q=0; m = (q < this.read ? this.read-q-1 : this.end-q);
@@ -854,7 +854,7 @@ InfBlocks.prototype.reset = function(z, c){
 	      this.bitb=b; this.bitk=k; 
 	      z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
-	      return inflate_flush(z,r);
+	      return this.inflate_flush(z,r);
 	    }
 	  }
 	}
@@ -881,7 +881,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    z.avail_in=n;
 	    z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	    this.write=q;
-	    return inflate_flush(z,r);
+	    return this.inflate_flush(z,r);
 	  };
 	  n--;
 	  b|=(z.next_in[p++]&0xff)<<k;
@@ -898,7 +898,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    this.bitb=b; this.bitk=k; 
 	    z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	    this.write=q;
-	    return inflate_flush(z,r);
+	    return this.inflate_flush(z,r);
 	  }
 	t = 258 + (t & 0x1f) + ((t >> 5) & 0x1f);
 	if(this.blens==null || this.blens.length<t){
@@ -925,7 +925,7 @@ InfBlocks.prototype.reset = function(z, c){
 	      z.avail_in=n;
 	      z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
-	      return inflate_flush(z,r);
+	      return this.inflate_flush(z,r);
 	    };
 	    n--;
 	    b|=(z.next_in[p++]&0xff)<<k;
@@ -953,7 +953,7 @@ InfBlocks.prototype.reset = function(z, c){
 	  this.bitb=b; this.bitk=k; 
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  write=q;
-	  return inflate_flush(z,r);
+	  return this.inflate_flush(z,r);
 	}
 
 	this.index = 0;
@@ -979,7 +979,7 @@ InfBlocks.prototype.reset = function(z, c){
 	      z.avail_in=n;
 	      z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
-	      return inflate_flush(z,r);
+	      return this.inflate_flush(z,r);
 	    };
 	    n--;
 	    b|=(z.next_in[p++]&0xff)<<k;
@@ -1010,7 +1010,7 @@ InfBlocks.prototype.reset = function(z, c){
 		z.avail_in=n;
 		z.total_in+=p-z.next_in_index;z.next_in_index=p;
 		this.write=q;
-		return inflate_flush(z,r);
+		return this.inflate_flush(z,r);
 	      };
 	      n--;
 	      b|=(z.next_in[p++]&0xff)<<k;
@@ -1035,7 +1035,7 @@ InfBlocks.prototype.reset = function(z, c){
 	      this.bitb=b; this.bitk=k; 
 	      z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
-	      return inflate_flush(z,r);
+	      return this.inflate_flush(z,r);
 	    }
 
 	    c = c == 16 ? this.blens[i-1] : 0;
@@ -1071,7 +1071,7 @@ InfBlocks.prototype.reset = function(z, c){
 	        this.bitb=b; this.bitk=k; 
 	        z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	        this.write=q;
-	        return inflate_flush(z,r);
+	        return this.inflate_flush(z,r);
 	    }
 	    this.codes.init(bl[0], bd[0], this.hufts, tl[0], this.hufts, td[0], z);
 	}
