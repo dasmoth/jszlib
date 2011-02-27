@@ -562,7 +562,7 @@ Inflate.prototype.inflate = function(z, f){
         z.avail_in--; z.total_in++;
         z.istate.need+=(z.next_in[z.next_in_index++]&0xff);
 
-        if(((int)(z.istate.was[0])) != ((int)(z.istate.need))){
+        if(((z.istate.was[0])) != ((z.istate.need))){
           z.istate.mode = BAD;
           z.msg = "incorrect data check";
           z.istate.marker = 5;       // can't try inflateSync
@@ -708,8 +708,6 @@ function InfBlocks(z, checkfn, w) {
 
 InfBlocks.prototype.reset = function(z, c){
     if(c) c[0]=this.check;
-    if(this.mode==IB_BTREE || this.mode==IB_DTREE){
-    }
     if(this.mode==IB_CODES){
       this.codes.free(z);
     }
@@ -986,9 +984,9 @@ InfBlocks.prototype.reset = function(z, c){
 	    k+=8;
 	  }
 
-	  if (this.tb[0]==-1){
+//	  if (this.tb[0]==-1){
 //            dlog("null...");
-	  }
+//	  }
 
 	  t=this.hufts[(this.tb[0]+(b & inflate_mask[t]))*3+1];
 	  c=this.hufts[(this.tb[0]+(b & inflate_mask[t]))*3+2];
