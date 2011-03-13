@@ -771,7 +771,7 @@ InfBlocks.prototype.reset = function(z, c){
               var tl=[];
 	      var td=[];
 
-	      this.inflate_trees_fixed(bl, bd, tl, td, z);
+	      inflate_trees_fixed(bl, bd, tl, td, z);
               this.codes.init(bl[0], bd[0], tl[0], 0, td[0], 0, z);
           }
 
@@ -1986,7 +1986,7 @@ InfTree.prototype.inflate_trees_dynamic = function(nl, nd, c, bl, bd, tl, td, hp
 
 */
 
-InfTree.prototype.inflate_trees_fixed = function(bl, bd, tl, td, z) {
+function inflate_trees_fixed(bl, bd, tl, td, z) {
     bl[0]=fixed_bl;
     bd[0]=fixed_bd;
     tl[0]=fixed_tl;
