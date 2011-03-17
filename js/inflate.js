@@ -771,7 +771,7 @@ InfBlocks.prototype.reset = function(z, c){
               var tl=[];
 	      var td=[];
 
-	      inflate_trees_fixed(bl, bd, tl, td, z);
+	      this.inflate_trees_fixed(bl, bd, tl, td, z);
               this.codes.init(bl[0], bd[0], tl[0], 0, td[0], 0, z);
           }
 
@@ -1986,7 +1986,7 @@ InfTree.prototype.inflate_trees_dynamic = function(nl, nd, c, bl, bd, tl, td, hp
 
 */
 
-function inflate_trees_fixed(bl, bd, tl, td, z) {
+InfTree.prototype.inflate_trees_fixed = function(bl, bd, tl, td, z) {
     bl[0]=fixed_bl;
     bd[0]=fixed_bd;
     tl[0]=fixed_tl;
@@ -2104,7 +2104,7 @@ function adler32(adler, /* byte[] */ buf,  index, len){
 
 
 
-function jszlib_inflate_buffer(buffer, start, length) {
+function jszlib_inflate_buffer(buffer, start, length, afterUncOffset) {
     if (!start) {
         buffer = new Uint8Array(buffer);
     } else {
@@ -2138,6 +2138,10 @@ function jszlib_inflate_buffer(buffer, start, length) {
         if (status == Z_STREAM_END) {
             break;
         }
+    }
+
+    if (afterUncOffset) {
+        afterUncOffset[0] = (start || 0) + z.next_in_index;
     }
 
     if (oBlockList.length == 1) {
