@@ -1627,8 +1627,9 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
 		  c-=2;
 		}
 		else{
-		  arrayCopy(s.window, r, s.window, q, 2);
-		  q+=2; r+=2; c-=2;
+		  s.window[q++]=s.window[r++]; // minimum count is three,
+		  s.window[q++]=s.window[r++]; // so unroll loop a little
+		  c-=2;
 		}
 	      }
 	      else{                  // else offset after destination
@@ -1653,14 +1654,8 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
 	      }
 
 	      // copy all or what's left
-	      if(q-r>0 && c>(q-r)){           
-		do{s.window[q++] = s.window[r++];}
+              do{s.window[q++] = s.window[r++];}
 		while(--c!=0);
-	      }
-	      else{
-		arrayCopy(s.window, r, s.window, q, c);
-		q+=c; r+=c; c=0;
-	      }
 	      break;
 	    }
 	    else if((e&64)==0){
@@ -2023,7 +2018,6 @@ function arrayCopy(src, srcOffset, dest, destOffset, count) {
     if (count == 0) {
         return;
     } 
-
     if (!src) {
         throw "Undef src";
     } else if (!dest) {
