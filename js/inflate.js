@@ -1,6 +1,8 @@
 /* -*- mode: javascript; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+define([],
+      function() {
 
-// 
+//
 // Javascript ZLib
 // By Thomas Down 2010-2011
 //
@@ -254,27 +256,27 @@ ZStream.prototype.inflateInit = function(w, nowrap) {
     }
     this.istate = new Inflate();
     return this.istate.inflateInit(this, nowrap?-w:w);
-}
+};
 
 ZStream.prototype.inflate = function(f) {
     if(this.istate==null) return Z_STREAM_ERROR;
     return this.istate.inflate(this, f);
-}
+};
 
 ZStream.prototype.inflateEnd = function(){
     if(this.istate==null) return Z_STREAM_ERROR;
     var ret=istate.inflateEnd(this);
     this.istate = null;
     return ret;
-}
+};
 ZStream.prototype.inflateSync = function(){
     // if(istate == null) return Z_STREAM_ERROR;
     return istate.inflateSync(this);
-}
+};
 ZStream.prototype.inflateSetDictionary = function(dictionary, dictLength){
     // if(istate == null) return Z_STREAM_ERROR;
     return istate.inflateSetDictionary(this, dictionary, dictLength);
-}
+};
 
 /*
 
@@ -390,20 +392,20 @@ function Inflate() {
 
 Inflate.prototype.inflateReset = function(z) {
     if(z == null || z.istate == null) return Z_STREAM_ERROR;
-    
+
     z.total_in = z.total_out = 0;
     z.msg = null;
     z.istate.mode = z.istate.nowrap!=0 ? BLOCKS : METHOD;
     z.istate.blocks.reset(z, null);
     return Z_OK;
-}
+};
 
 Inflate.prototype.inflateEnd = function(z){
     if(this.blocks != null)
       this.blocks.free(z);
     this.blocks=null;
     return Z_OK;
-}
+};
 
 Inflate.prototype.inflateInit = function(z, w){
     z.msg = null;
@@ -423,14 +425,14 @@ Inflate.prototype.inflateInit = function(z, w){
     }
     this.wbits=w;
 
-    z.istate.blocks=new InfBlocks(z, 
+    z.istate.blocks=new InfBlocks(z,
 				  z.istate.nowrap!=0 ? null : this,
 				  1<<w);
 
     // reset state
     this.inflateReset(z);
     return Z_OK;
-  }
+  };
 
 Inflate.prototype.inflate = function(z, f){
     var r, b;
@@ -578,7 +580,7 @@ Inflate.prototype.inflate = function(z, f){
         return Z_STREAM_ERROR;
       }
     }
-  }
+  };
 
 
 Inflate.prototype.inflateSetDictionary = function(z,  dictionary, dictLength) {
@@ -600,10 +602,10 @@ Inflate.prototype.inflateSetDictionary = function(z,  dictionary, dictLength) {
     z.istate.blocks.set_dictionary(dictionary, index, length);
     z.istate.mode = BLOCKS;
     return Z_OK;
-  }
+  };
 
 //  static private byte[] mark = {(byte)0, (byte)0, (byte)0xff, (byte)0xff};
-var mark = [0, 0, 255, 255]
+var mark = [0, 0, 255, 255];
 
 Inflate.prototype.inflateSync = function(z){
     var n;       // number of bytes to look at
@@ -652,7 +654,7 @@ Inflate.prototype.inflateSync = function(z){
     z.total_in=r;  z.total_out = w;
     z.istate.mode = BLOCKS;
     return Z_OK;
-}
+};
 
   // Returns true if inflate is currently at the end of a block generated
   // by Z_SYNC_FLUSH or Z_FULL_FLUSH. This function is used by one PPP
@@ -664,7 +666,7 @@ Inflate.prototype.inflateSyncPoint = function(z){
     if(z == null || z.istate == null || z.istate.blocks == null)
       return Z_STREAM_ERROR;
     return z.istate.blocks.sync_point();
-}
+};
 
 
 //
@@ -681,24 +683,24 @@ function InfBlocks(z, checkfn, w) {
     this.mode = IB_TYPE;
     this.reset(z, null);
 
-    this.left = 0;            // if STORED, bytes left to copy 
+    this.left = 0;            // if STORED, bytes left to copy
 
-    this.table = 0;           // table lengths (14 bits) 
-    this.index = 0;           // index into blens (or border) 
-    this.blens = null;         // bit lengths of codes 
-    this.bb=new Int32Array(1); // bit length tree depth 
-    this.tb=new Int32Array(1); // bit length decoding tree 
+    this.table = 0;           // table lengths (14 bits)
+    this.index = 0;           // index into blens (or border)
+    this.blens = null;         // bit lengths of codes
+    this.bb=new Int32Array(1); // bit length tree depth
+    this.tb=new Int32Array(1); // bit length decoding tree
 
     this.codes = new InfCodes();
 
-    this.last = 0;            // true if this block is the last block 
+    this.last = 0;            // true if this block is the last block
 
-  // mode independent information 
-    this.bitk = 0;            // bits in bit buffer 
-    this.bitb = 0;            // bit buffer 
-    this.read = 0;            // window read pointer 
-    this.write = 0;           // window write pointer 
-    this.check = 0;          // check on output 
+  // mode independent information
+    this.bitk = 0;            // bits in bit buffer
+    this.bitb = 0;            // bit buffer
+    this.read = 0;            // window read pointer
+    this.write = 0;           // window write pointer
+    this.check = 0;          // check on output
 
     this.inftree=new InfTree();
 }
@@ -718,7 +720,7 @@ InfBlocks.prototype.reset = function(z, c){
 
     if(this.checkfn)
       z.adler=this.check=z._adler.adler32(0, null, 0, 0);
-  }
+  };
 
  InfBlocks.prototype.proc = function(z, r){
     var t;              // temporary storage
@@ -743,7 +745,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    r=Z_OK;
 	  }
 	  else{
-	    this.bitb=b; this.bitk=k; 
+	    this.bitb=b; this.bitk=k;
 	    z.avail_in=n;
 	    z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	    this.write=q;
@@ -757,7 +759,7 @@ InfBlocks.prototype.reset = function(z, c){
 	this.last = t & 1;
 
 	switch (t >>> 1){
-        case 0:                         // stored 
+        case 0:                         // stored
           {b>>>=(3);k-=(3);}
           t = k & 7;                    // go to byte boundary
 
@@ -792,7 +794,7 @@ InfBlocks.prototype.reset = function(z, c){
           z.msg = "invalid block type";
           r = Z_DATA_ERROR;
 
-	  this.bitb=b; this.bitk=k; 
+	  this.bitb=b; this.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  this.write=q;
 	  return this.inflate_flush(z,r);
@@ -804,7 +806,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    r=Z_OK;
 	  }
 	  else{
-	    this.bitb=b; this.bitk=k; 
+	    this.bitb=b; this.bitk=k;
 	    z.avail_in=n;
 	    z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	    this.write=q;
@@ -820,7 +822,7 @@ InfBlocks.prototype.reset = function(z, c){
 	  z.msg = "invalid stored block lengths";
 	  r = Z_DATA_ERROR;
 
-	  this.bitb=b; this.bitk=k; 
+	  this.bitb=b; this.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  this.write=q;
 	  return this.inflate_flush(z,r);
@@ -831,7 +833,7 @@ InfBlocks.prototype.reset = function(z, c){
 	break;
       case IB_STORED:
 	if (n == 0){
-	  this.bitb=b; this.bitk=k; 
+	  this.bitb=b; this.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  write=q;
 	  return this.inflate_flush(z,r);
@@ -842,14 +844,14 @@ InfBlocks.prototype.reset = function(z, c){
 	    q=0; m=(q<this.read ? this.read-q-1 : this.end-q);
 	  }
 	  if(m==0){
-	    this.write=q; 
+	    this.write=q;
 	    r=this.inflate_flush(z,r);
 	    q=this.write; m = (q < this.read ? this.read-q-1 : this.end-q);
 	    if(q==this.end && this.read != 0){
 	      q=0; m = (q < this.read ? this.read-q-1 : this.end-q);
 	    }
 	    if(m==0){
-	      this.bitb=b; this.bitk=k; 
+	      this.bitb=b; this.bitk=k;
 	      z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
 	      return this.inflate_flush(z,r);
@@ -875,7 +877,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    r=Z_OK;
 	  }
 	  else{
-	    this.bitb=b; this.bitk=k; 
+	    this.bitb=b; this.bitk=k;
 	    z.avail_in=n;
 	    z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	    this.write=q;
@@ -893,7 +895,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    z.msg = "too many length or distance symbols";
 	    r = Z_DATA_ERROR;
 
-	    this.bitb=b; this.bitk=k; 
+	    this.bitb=b; this.bitk=k;
 	    z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	    this.write=q;
 	    return this.inflate_flush(z,r);
@@ -919,7 +921,7 @@ InfBlocks.prototype.reset = function(z, c){
 	      r=Z_OK;
 	    }
 	    else{
-	      this.bitb=b; this.bitk=k; 
+	      this.bitb=b; this.bitk=k;
 	      z.avail_in=n;
 	      z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
@@ -948,7 +950,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    this.mode = IB_BAD;
 	  }
 
-	  this.bitb=b; this.bitk=k; 
+	  this.bitb=b; this.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  write=q;
 	  return this.inflate_flush(z,r);
@@ -973,7 +975,7 @@ InfBlocks.prototype.reset = function(z, c){
 	      r=Z_OK;
 	    }
 	    else{
-	      this.bitb=b; this.bitk=k; 
+	      this.bitb=b; this.bitk=k;
 	      z.avail_in=n;
 	      z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
@@ -1004,7 +1006,7 @@ InfBlocks.prototype.reset = function(z, c){
 		r=Z_OK;
 	      }
 	      else{
-		this.bitb=b; this.bitk=k; 
+		this.bitb=b; this.bitk=k;
 		z.avail_in=n;
 		z.total_in+=p-z.next_in_index;z.next_in_index=p;
 		this.write=q;
@@ -1030,7 +1032,7 @@ InfBlocks.prototype.reset = function(z, c){
 	      z.msg = "invalid bit length repeat";
 	      r = Z_DATA_ERROR;
 
-	      this.bitb=b; this.bitk=k; 
+	      this.bitb=b; this.bitk=k;
 	      z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	      this.write=q;
 	      return this.inflate_flush(z,r);
@@ -1055,7 +1057,7 @@ InfBlocks.prototype.reset = function(z, c){
 	    bd[0] = 6;         // must be <= 9 for lookahead assumptions
 
 	    t = this.table;
-	    t = this.inftree.inflate_trees_dynamic(257 + (t & 0x1f), 
+	    t = this.inftree.inflate_trees_dynamic(257 + (t & 0x1f),
 					      1 + ((t >> 5) & 0x1f),
 					      this.blens, bl, bd, tl, td, this.hufts, z);
 
@@ -1066,7 +1068,7 @@ InfBlocks.prototype.reset = function(z, c){
 	        }
 	        r = t;
 
-	        this.bitb=b; this.bitk=k; 
+	        this.bitb=b; this.bitk=k;
 	        z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	        this.write=q;
 	        return this.inflate_flush(z,r);
@@ -1094,11 +1096,11 @@ InfBlocks.prototype.reset = function(z, c){
 	}
 	this.mode = IB_DRY;
       case IB_DRY:
-	this.write=q; 
-	r = this.inflate_flush(z, r); 
+	this.write=q;
+	r = this.inflate_flush(z, r);
 	q=this.write; m = (q < this.read ? this.read-q-1 : this.end-q);
 	if (this.read != this.write){
-	  this.bitb=b; this.bitk=k; 
+	  this.bitb=b; this.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  this.write=q;
 	  return this.inflate_flush(z, r);
@@ -1107,14 +1109,14 @@ InfBlocks.prototype.reset = function(z, c){
       case IB_DONE:
 	r = Z_STREAM_END;
 
-	this.bitb=b; this.bitk=k; 
+	this.bitb=b; this.bitk=k;
 	z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	this.write=q;
 	return this.inflate_flush(z, r);
       case IB_BAD:
 	r = Z_DATA_ERROR;
 
-	this.bitb=b; this.bitk=k; 
+	this.bitb=b; this.bitk=k;
 	z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	this.write=q;
 	return this.inflate_flush(z, r);
@@ -1122,30 +1124,30 @@ InfBlocks.prototype.reset = function(z, c){
       default:
 	r = Z_STREAM_ERROR;
 
-	this.bitb=b; this.bitk=k; 
+	this.bitb=b; this.bitk=k;
 	z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	this.write=q;
 	return this.inflate_flush(z, r);
       }
     }
-  }
+  };
 
 InfBlocks.prototype.free = function(z){
     this.reset(z, null);
     this.window=null;
     this.hufts=null;
-}
+};
 
 InfBlocks.prototype.set_dictionary = function(d, start, n){
     arrayCopy(d, start, window, 0, n);
     this.read = this.write = n;
-}
+};
 
   // Returns true if inflate is currently at the end of a block generated
-  // by Z_SYNC_FLUSH or Z_FULL_FLUSH. 
+  // by Z_SYNC_FLUSH or Z_FULL_FLUSH.
 InfBlocks.prototype.sync_point = function(){
     return this.mode == IB_LENS;
-}
+};
 
   // copy as much as possible from the sliding window to the output area
 InfBlocks.prototype.inflate_flush = function(z, r){
@@ -1207,7 +1209,7 @@ InfBlocks.prototype.inflate_flush = function(z, r){
 
     // done
     return r;
-  }
+  };
 
 //
 // InfCodes.java
@@ -1236,9 +1238,9 @@ InfCodes.prototype.init = function(bl, bd, tl, tl_index, td, td_index, z) {
     this.dtree = td;
     this.dtree_index=td_index;
     this.tree=null;
-}
+};
 
-InfCodes.prototype.proc = function(s, z, r){ 
+InfCodes.prototype.proc = function(s, z, r){
     var j;              // temporary storage
     var t;              // temporary pointer (int[])
     var tindex;         // temporary pointer
@@ -1265,8 +1267,8 @@ InfCodes.prototype.proc = function(s, z, r){
 	  s.bitb=b;s.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  s.write=q;
-	  r = this.inflate_fast(this.lbits, this.dbits, 
-			   this.ltree, this.ltree_index, 
+	  r = this.inflate_fast(this.lbits, this.dbits,
+			   this.ltree, this.ltree_index,
 			   this.dtree, this.dtree_index,
 			   s, z);
 
@@ -1445,7 +1447,7 @@ InfCodes.prototype.proc = function(s, z, r){
 		z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 		s.write=q;
 		return s.inflate_flush(z,r);
-	      }  
+	      }
 	    }
 	  }
 
@@ -1521,11 +1523,11 @@ InfCodes.prototype.proc = function(s, z, r){
 	return s.inflate_flush(z,r);
       }
     }
-  }
+  };
 
 InfCodes.prototype.free = function(z){
     //  ZFREE(z, c);
-}
+};
 
   // Called with number of bytes left to write in window at least 258
   // (the maximum string length) and number of input bytes available
@@ -1568,7 +1570,7 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
       }
 
       t= b&ml;
-      tp=tl; 
+      tp=tl;
       tp_index=tl_index;
       tp_index_t_3=(tp_index+t)*3;
       if ((e = tp[tp_index_t_3]) == 0){
@@ -1621,7 +1623,7 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
 	      if (q >= d){                // offset before dest
 		//  just copy
 		r=q-d;
-		if(q-r>0 && 2>(q-r)){           
+		if(q-r>0 && 2>(q-r)){
 		  s.window[q++]=s.window[r++]; // minimum count is three,
 		  s.window[q++]=s.window[r++]; // so unroll loop a little
 		  c-=2;
@@ -1640,7 +1642,7 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
 		e=s.end-r;
 		if(c>e){             // if source crosses,
 		  c-=e;              // wrapped copy
-		  if(q-r>0 && e>(q-r)){           
+		  if(q-r>0 && e>(q-r)){
 		    do{s.window[q++] = s.window[r++];}
 		    while(--e!=0);
 		  }
@@ -1696,7 +1698,7 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
 	else if((e&32)!=0){
 
 	  c=z.avail_in-n;c=(k>>3)<c?k>>3:c;n+=c;p-=c;k-=c<<3;
- 
+
 	  s.bitb=b;s.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
 	  s.write=q;
@@ -1714,9 +1716,9 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
 
 	  return Z_DATA_ERROR;
 	}
-      } 
+      }
       while(true);
-    } 
+    }
     while(m>=258 && n>= 10);
 
     // not enough input or output--restore pointers and return
@@ -1727,7 +1729,7 @@ InfCodes.prototype.inflate_fast = function(bl, bd, tl, tl_index, td, td_index, s
     s.write=q;
 
     return Z_OK;
-}
+};
 
 //
 // InfTree.java
@@ -1862,7 +1864,7 @@ InfTree.prototype.huft_build = function(b, bindex, n, s, d, e, t, m, hp, hn, v) 
           }
           this.u[h] = q = /*hp+*/ this.hn[0];   // DEBUG
           this.hn[0] += z;
- 
+
 	  // connect to last table, if there is one
 	  if(h!=0){
             this.x[h]=i;           // save pattern for backing up
@@ -1914,7 +1916,7 @@ InfTree.prototype.huft_build = function(b, bindex, n, s, d, e, t, m, hp, hn, v) 
     }
     // Return Z_BUF_ERROR if we were given an incomplete table
     return y != 0 && g != 1 ? Z_BUF_ERROR : Z_OK;
-}
+};
 
 InfTree.prototype.inflate_trees_bits = function(c, bb, tb, hp, z) {
     var result;
@@ -1930,7 +1932,7 @@ InfTree.prototype.inflate_trees_bits = function(c, bb, tb, hp, z) {
       result = Z_DATA_ERROR;
     }
     return result;
-}
+};
 
 InfTree.prototype.inflate_trees_dynamic = function(nl, nd, c, bl, bd, tl, td, hp, z) {
     var result;
@@ -1970,12 +1972,13 @@ InfTree.prototype.inflate_trees_dynamic = function(nl, nd, c, bl, bd, tl, td, hp
     }
 
     return Z_OK;
-}
+};
+
 /*
   static int inflate_trees_fixed(int[] bl,  //literal desired/actual bit depth
                                  int[] bd,  //distance desired/actual bit depth
                                  int[][] tl,//literal/length tree result
-                                 int[][] td,//distance tree result 
+                                 int[][] td,//distance tree result
                                  ZStream z  //for memory allocation
 				 ){
 
@@ -1990,6 +1993,7 @@ function inflate_trees_fixed(bl, bd, tl, td, z) {
 }
 
 InfTree.prototype.initWorkArea = function(vsize){
+    var i;
     if(this.hn==null){
         this.hn=new Int32Array(1);
         this.v=new Int32Array(vsize);
@@ -1998,17 +2002,17 @@ InfTree.prototype.initWorkArea = function(vsize){
         this.u=new Int32Array(BMAX);
         this.x=new Int32Array(BMAX+1);
     }
-    if(this.v.length<vsize){ 
-        this.v=new Int32Array(vsize); 
+    if(this.v.length<vsize){
+        this.v=new Int32Array(vsize);
     }
-    for(var i=0; i<vsize; i++){this.v[i]=0;}
-    for(var i=0; i<BMAX+1; i++){this.c[i]=0;}
-    for(var i=0; i<3; i++){this.r[i]=0;}
+    for(i=0; i<vsize; i++){this.v[i]=0;}
+    for(i=0; i<BMAX+1; i++){this.c[i]=0;}
+    for(i=0; i<3; i++){this.r[i]=0;}
 //  for(int i=0; i<BMAX; i++){u[i]=0;}
     arrayCopy(this.c, 0, this.u, 0, BMAX);
 //  for(int i=0; i<BMAX+1; i++){x[i]=0;}
     arrayCopy(this.c, 0, this.x, 0, BMAX+1);
-}
+};
 
 var testArray = new Uint8Array(1);
 var hasSubarray = (typeof testArray.subarray === 'function');
@@ -2017,7 +2021,7 @@ var hasSlice = false; /* (typeof testArray.slice === 'function'); */ // Chrome s
 function arrayCopy(src, srcOffset, dest, destOffset, count) {
     if (count == 0) {
         return;
-    } 
+    }
     if (!src) {
         throw "Undef src";
     } else if (!dest) {
@@ -2027,10 +2031,10 @@ function arrayCopy(src, srcOffset, dest, destOffset, count) {
     if (srcOffset == 0 && count == src.length) {
         arrayCopy_fast(src, dest, destOffset);
     } else if (hasSubarray) {
-        arrayCopy_fast(src.subarray(srcOffset, srcOffset + count), dest, destOffset); 
+        arrayCopy_fast(src.subarray(srcOffset, srcOffset + count), dest, destOffset);
     } else if (src.BYTES_PER_ELEMENT == 1 && count > 100) {
         arrayCopy_fast(new Uint8Array(src.buffer, src.byteOffset + srcOffset, count), dest, destOffset);
-    } else { 
+    } else {
         arrayCopy_slow(src, srcOffset, dest, destOffset, count);
     }
 
@@ -2051,7 +2055,7 @@ function arrayCopy_fast(src, dest, destOffset) {
 
 
   // largest prime smaller than 65536
-var ADLER_BASE=65521; 
+var ADLER_BASE=65521;
   // NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
 var ADLER_NMAX=5552;
 
@@ -2096,9 +2100,7 @@ function adler32(adler, /* byte[] */ buf,  index, len){
     return (s2<<16)|s1;
 }
 
-
-
-function jszlib_inflate_buffer(buffer, start, length, afterUncOffset) {
+return function(buffer, start, length, afterUncOffset) {
     if (!start) {
         buffer = new Uint8Array(buffer);
     } else {
@@ -2150,4 +2152,6 @@ function jszlib_inflate_buffer(buffer, start, length, afterUncOffset) {
         }
         return out.buffer;
     }
-}
+};
+
+});
