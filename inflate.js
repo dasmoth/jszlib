@@ -2014,8 +2014,11 @@ InfTree.prototype.initWorkArea = function(vsize){
     arrayCopy(this.c, 0, this.x, 0, BMAX+1);
 };
 
-var testArray = new Uint8Array(1);
-var hasSubarray = (typeof testArray.subarray === 'function');
+var testArray;
+try {
+    testArray = new Uint8Array(1);
+} catch (x) {}
+var hasSubarray = (testArray && typeof testArray.subarray === 'function');
 var hasSlice = false; /* (typeof testArray.slice === 'function'); */ // Chrome slice performance is so dire that we're currently not using it...
 
 function arrayCopy(src, srcOffset, dest, destOffset, count) {
