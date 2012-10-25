@@ -412,7 +412,7 @@ Inflate.prototype.inflateInit = function(z, w){
     this.blocks = null;
 
     // handle undocumented nowrap option (no zlib header or check)
-    nowrap = 0;
+    var nowrap = 0;
     if(w < 0){
       w = - w;
       nowrap = 1;
@@ -589,11 +589,11 @@ Inflate.prototype.inflateSetDictionary = function(z,  dictionary, dictLength) {
     if(z==null || z.istate == null|| z.istate.mode != DICT0)
       return Z_STREAM_ERROR;
 
-    if(z._adler.adler32(1, dictionary, 0, dictLength)!=z.adler){
+    if( adler32(1, dictionary, 0, dictLength) != z.adler ){
       return Z_DATA_ERROR;
     }
 
-    z.adler = z._adler.adler32(0, null, 0, 0);
+    z.adler = adler32(0, null, 0, 0);
 
     if(length >= (1<<z.istate.wbits)){
       length = (1<<z.istate.wbits)-1;
@@ -718,8 +718,10 @@ InfBlocks.prototype.reset = function(z, c){
     this.bitb=0;
     this.read=this.write=0;
 
-    if(this.checkfn)
-      z.adler=this.check=z._adler.adler32(0, null, 0, 0);
+    if(this.checkfn) {
+        this.check = adler32(0, null, 0, 0);
+        z.adler = this.check;
+    }
   };
 
  InfBlocks.prototype.proc = function(z, r){
@@ -829,13 +831,13 @@ InfBlocks.prototype.reset = function(z, c){
 	}
 	this.left = (b & 0xffff);
 	b = k = 0;                       // dump bits
-	this.mode = left!=0 ? IB_STORED : (this.last!=0 ? IB_DRY : IB_TYPE);
+	this.mode = this.left!=0 ? IB_STORED : (this.last!=0 ? IB_DRY : IB_TYPE);
 	break;
       case IB_STORED:
 	if (n == 0){
 	  this.bitb=b; this.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
-	  write=q;
+	  this.write=q;
 	  return this.inflate_flush(z,r);
 	}
 
@@ -863,7 +865,7 @@ InfBlocks.prototype.reset = function(z, c){
 	t = this.left;
 	if(t>n) t = n;
 	if(t>m) t = m;
-	arrayCopy(z.next_in, p, window, q, t);
+	arrayCopy(z.next_in, p, this.window, q, t);
 	p += t;  n -= t;
 	q += t;  m -= t;
 	if ((this.left -= t) != 0)
@@ -913,7 +915,7 @@ InfBlocks.prototype.reset = function(z, c){
 	{b>>>=(14);k-=(14);}
 
 	this.index = 0;
-	mode = IB_BTREE;
+	this.mode = IB_BTREE;
       case IB_BTREE:
 	while (this.index < 4 + (this.table >>> 10)){
 	  while(k<(3)){
@@ -952,7 +954,7 @@ InfBlocks.prototype.reset = function(z, c){
 
 	  this.bitb=b; this.bitk=k;
 	  z.avail_in=n;z.total_in+=p-z.next_in_index;z.next_in_index=p;
-	  write=q;
+	  this.write=q;
 	  return this.inflate_flush(z,r);
 	}
 
@@ -1105,7 +1107,7 @@ InfBlocks.prototype.reset = function(z, c){
 	  this.write=q;
 	  return this.inflate_flush(z, r);
 	}
-	mode = DONE;
+	this.mode = DONE;
       case IB_DONE:
 	r = Z_STREAM_END;
 
@@ -1139,7 +1141,7 @@ InfBlocks.prototype.free = function(z){
 };
 
 InfBlocks.prototype.set_dictionary = function(d, start, n){
-    arrayCopy(d, start, window, 0, n);
+    arrayCopy(d, start, this.window, 0, n);
     this.read = this.write = n;
 };
 
@@ -1169,8 +1171,10 @@ InfBlocks.prototype.inflate_flush = function(z, r){
     z.total_out += n;
 
     // update check information
-    if(this.checkfn != null)
-      z.adler=this.check=z._adler.adler32(this.check, this.window, q, n);
+    if(this.checkfn != null) {
+      this.check = adler32(this.check, this.window, q, n);
+      z.adler = this.check;
+    }
 
     // copy as far as end of window
     arrayCopy(this.window, q, z.next_out, p, n);
@@ -1194,8 +1198,10 @@ InfBlocks.prototype.inflate_flush = function(z, r){
       z.total_out += n;
 
       // update check information
-      if(this.checkfn != null)
-	z.adler=this.check=z._adler.adler32(this.check, this.window, q, n);
+      if(this.checkfn != null) {
+	  this.check = adler32(this.check, this.window, q, n);
+          z.adler = this.check;
+      }
 
       // copy
       arrayCopy(this.window, q, z.next_out, p, n);
