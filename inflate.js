@@ -34,15 +34,15 @@ var Z_FINISH=4;
 var Z_DEFLATED=8;
 
 var STATUS_STRINGS = [];
-var Z_OK            = 0;  STATUS_STRINGS[Z_OK] = 'OK';
-var Z_STREAM_END    = 1;  STATUS_STRINGS[Z_STREAM_END] = 'end of stream (Z_STREAM_END)';
-var Z_NEED_DICT     = 2;  STATUS_STRINGS[Z_NEED_DICT] = 'inconsistent stream data (Z_NEED_DICT)';
+var Z_OK            = 0;  STATUS_STRINGS[Z_OK] = 'Z_OK: stream correct';
+var Z_STREAM_END    = 1;  STATUS_STRINGS[Z_STREAM_END] = 'Z_STREAM_END: end of stream';
+var Z_NEED_DICT     = 2;  STATUS_STRINGS[Z_NEED_DICT] = 'Z_NEED_DICT: stream not yet complete';
 
 var Z_ERRNO         = -1; STATUS_STRINGS[Z_ERRNO] = 'Z_ERRNO';
 var Z_STREAM_ERROR  = -2; STATUS_STRINGS[Z_STREAM_ERROR] = 'Z_STREAM_ERROR';
 var Z_DATA_ERROR    = -3; STATUS_STRINGS[Z_DATA_ERROR] = 'Z_DATA_ERROR';
-var Z_MEM_ERROR     = -4; STATUS_STRINGS[Z_MEM_ERROR ] = 'Z_MEM_ERROR ';
-var Z_BUF_ERROR     = -5; STATUS_STRINGS[Z_BUF_ERROR ] = 'premature end of buffer (Z_BUF_ERROR)';
+var Z_MEM_ERROR     = -4; STATUS_STRINGS[Z_MEM_ERROR ] = 'Z_MEM_ERROR';
+var Z_BUF_ERROR     = -5; STATUS_STRINGS[Z_BUF_ERROR ] = 'Z_BUF_ERROR: premature end of buffer';
 var Z_VERSION_ERROR = -6; STATUS_STRINGS[Z_VERSION_ERROR] = 'Z_VERSION_ERROR';
 
 var METHOD=0;   // waiting for method byte
@@ -240,6 +240,7 @@ var fixed_td = [
         0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6,
         7, 7, 8, 8, 9, 9, 10, 10, 11, 11,
         12, 12, 13, 13];
+
 
 //
 // ZStream.java
@@ -2090,11 +2091,14 @@ return function(buffer, start, length, afterUncOffset) {
         z.avail_out = obuf.length;
         var status = z.inflate(Z_NO_FLUSH);
         if (status != Z_OK && status != Z_STREAM_END) {
-            throw z.msg ?  typeof z.msg == 'object' ? z.msg            :
-                           typeof z.msg == 'string' ? new Error(z.msg) :
-                                                      new Error('Unknown error in inflate: msg="'
-                                                                +z.msg+'", status="'+STATUS_STRINGS[status]||status+'"')
-                        :  new Error('Inflate error, status="'+STATUS_STRINGS[status]||status+'")');
+            var error = z.msg ? typeof z.msg == 'object' ? z.msg            :
+                                typeof z.msg == 'string' ? new Error(z.msg) :
+                                                           new Error('Unknown error in inflate: msg="'
+                                                              +z.msg+'", status="'+STATUS_STRINGS[status]||status+'"')
+                              :  new Error('Inflate error, status="'+STATUS_STRINGS[status]||status+'")');
+            error.statusCode = status;
+            error.statusString = STATUS_STRINGS[status];
+            throw error;
         }
         if (z.avail_out != 0) {
             var newob = new Uint8Array(obuf.length - z.avail_out);
