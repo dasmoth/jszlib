@@ -5,7 +5,6 @@ var testArray;
 try {
     testArray = new Uint8Array(1);
 } catch (x) {}
-var hasSubarray = (testArray && typeof testArray.subarray === 'function');
 var hasSlice = false; /* (typeof testArray.slice === 'function'); */ // Chrome slice performance is so dire that we're currently not using it...
 
 function arrayCopy(src, srcOffset, dest, destOffset, count) {
@@ -20,7 +19,7 @@ function arrayCopy(src, srcOffset, dest, destOffset, count) {
 
     if (srcOffset == 0 && count == src.length) {
         arrayCopy_fast(src, dest, destOffset);
-    } else if (hasSubarray) {
+    } else if ( src.subarray ) {
         arrayCopy_fast(src.subarray(srcOffset, srcOffset + count), dest, destOffset);
     } else if (src.BYTES_PER_ELEMENT == 1 && count > 100) {
         arrayCopy_fast(new Uint8Array(src.buffer, src.byteOffset + srcOffset, count), dest, destOffset);
