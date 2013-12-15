@@ -2119,7 +2119,7 @@ function jszlib_inflate_buffer(buffer, start, length, afterUncOffset) {
         z.next_out_index = 0;
         z.avail_out = obuf.length;
         var status = z.inflate(Z_NO_FLUSH);
-        if (status != Z_OK && status != Z_STREAM_END) {
+        if (status != Z_OK && status != Z_STREAM_END && status != Z_BUF_ERROR) {
             throw z.msg;
         }
         if (z.avail_out != 0) {
@@ -2129,7 +2129,7 @@ function jszlib_inflate_buffer(buffer, start, length, afterUncOffset) {
         }
         oBlockList.push(obuf);
         totalSize += obuf.length;
-        if (status == Z_STREAM_END) {
+        if (status == Z_STREAM_END || status == Z_BUF_ERROR) {
             break;
         }
     }
