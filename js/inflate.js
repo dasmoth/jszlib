@@ -2151,3 +2151,10 @@ function jszlib_inflate_buffer(buffer, start, length, afterUncOffset) {
         return out.buffer;
     }
 }
+
+if (typeof(module) !== 'undefined') {
+  module.exports = {
+    inflateBuffer: jszlib_inflate_buffer,
+    arrayCopy: arrayCopy
+  };
+}
