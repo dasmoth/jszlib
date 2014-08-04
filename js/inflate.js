@@ -2101,6 +2101,8 @@ function adler32(adler, /* byte[] */ buf,  index, len){
 function jszlib_inflate_buffer(buffer, start, length, afterUncOffset) {
     if (!start) {
         buffer = new Uint8Array(buffer);
+    } else if (!length) {
+        buffer = new Uint8Array(buffer, start, buffer.byteLength - start);
     } else {
         buffer = new Uint8Array(buffer, start, length);
     }
