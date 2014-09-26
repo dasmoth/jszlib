@@ -861,7 +861,7 @@ InfBlocks.prototype.reset = function(z, c){
 	t = this.left;
 	if(t>n) t = n;
 	if(t>m) t = m;
-	arrayCopy(z.next_in, p, window, q, t);
+	arrayCopy(z.next_in, p, this.window, q, t);
 	p += t;  n -= t;
 	q += t;  m -= t;
 	if ((this.left -= t) != 0)

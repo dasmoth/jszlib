@@ -1,7 +1,7 @@
 {
     "name": "jszlib",
     "description": "Pure-Javascript zlib inflate library",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "homepage": "https://github.com/dasmoth/jszlib/",
     "bugs":  "https://github.com/dasmoth/jszlib/issues",
     "repository": {
